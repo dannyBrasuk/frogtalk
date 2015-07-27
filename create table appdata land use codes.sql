@@ -1,4 +1,4 @@
---   Dimension table of habitat sites for the EDW
+--   app lookup table; to be used ETL
 
 USE frogtalk;
 GO
