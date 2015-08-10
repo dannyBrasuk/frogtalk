@@ -30,10 +30,11 @@ CREATE TABLE edw.date_dim
         relative_years INT NULL,
         standard_date VARCHAR(10) NULL,
         week_day_flag BOOLEAN NULL, 
-        holiday_flag BOOLEAN NULL,
-        open_flag BOOLEAN NULL,
+
         firstday_of_calendar_month_flag BOOLEAN NULL,
         lastday_of_calendar_month_flag BOOLEAN NULL,
+        open_flag BOOLEAN NULL,
+        holiday_flag BOOLEAN NULL,
         holiday_text VARCHAR(50) NULL,
 
         PRIMARY KEY (date_pk) WITH (FILLFACTOR=100) USING INDEX TABLESPACE myIndexSpace

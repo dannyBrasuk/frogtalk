@@ -1,8 +1,27 @@
-CREATE OR  REPLACE FUNCTION edw.DateDim_insert 
+USE frogtalk;
+GO
+/*
+
+Standard date dimension table.  
+
+Note that some elements are more germane to commercial and public sector operations than to environmental tracking. 
+I left the values in anyway, One such element is the "open (for business) flag," which also happens to be specific to the business.  Adjsut as needed.
+
+To execute:
+
+--TRUNCATE TABLE edw.date_dim RESTRICT;
+
+select * FROM edw.DateDim_insert ( '01/01/2000'::date, '01/01/2031'::date, FALSE::boolean) ;
+
+select * from edw.date_dim;
+
+*/
+
+CREATE OR  REPLACE FUNCTION edw.date_dim_insert
 (
     in start_date date =  '01/1/1900'::date, 
-    in end_date date = '01/01/2030'::date,                  --Non inclusive. Stops on the day before this.
-    in debug_flag boolean =FALSE
+    in end_date date = '01/01/2030'::date,                      --Non inclusive. Stops on the day before this.
+    in debug_flag boolean =FALSE                              -- toogle on/off run-time information 
 ) 
 RETURNS  int  
 AS $body$
@@ -12,9 +31,24 @@ DECLARE
         the_current_month int;       --@CurrentMonth
         the_current_date date;       --@CurrentDate
         rows_inserted int;
+        rows_updated int;
  BEGIN
 
-        --Trap for missing inputs and substitute a default.
+        --**
+        --Trap for missing or invalid start and end daes.
+/*
+
+22007	invalid_datetime_format
+EXCEPTION
+    WHEN condition [ OR condition ... ] THEN
+        handler_statements
+    [ WHEN condition [ OR condition ... ] THEN
+          handler_statements
+      ... ]
+END;
+*/
+        --**
+        --Substitute a default if not supplied.
         IF start_date IS NULL THEN 
             start_date:= CAST( '01/1/1900' AS date) ;
         END IF;
@@ -24,10 +58,11 @@ DECLARE
         END IF;
 
         --***
-        --Initialize
+        --Initialize table with dates. 
 
-        --Need a temp table for counting day of week (dow) occurance in a month;  used in the loop below
-        --"dow" is short for day of week
+        --Need a temp table for counting day of week (dow) occurance in a month;  used in the loop below ("dow" is short for day of week).
+        --Important: The sequence is  0 is Sunday, 1 = Monday, 2= Tuesday, etc.  Postgres defaults to this.  If the default changes, then the
+        --weekday driven conditions in the Insert/Select need to be altered.
         DROP TABLE IF EXISTS temp_day_of_week;
 
        CREATE  TEMP TABLE  temp_day_of_week
@@ -43,9 +78,6 @@ DECLARE
         IF debug_flag THEN
                 RAISE NOTICE 'Initial values for date_of_current_row: %,   the_current_date: %,  the_current_month: %' , date_of_current_row, the_current_date , the_current_month;
         END IF;
-
-        --Empty the table
-        --TRUNCATE TABLE edw.date_dim RESTRICT;
 
          --Loop to pipulate the table
          WHILE date_of_current_row < end_date LOOP
@@ -71,7 +103,7 @@ DECLARE
                 INSERT INTO edw.date_dim    (     date_pk, full_date, day_of_month, day_suffix, day_of_week,day_of_week_number, day_of_week_in_month, day_of_year_number
                                                                            , relative_days, week_of_year_number, week_of_month_number, relative_weeks, calendar_month_number, calendar_month_name, relative_months
                                                                            , calendar_quarter_number, calendar_quarter_name, relative_quarters, calendar_year_number, relative_years, standard_date
-                                                                           , week_day_flag, holiday_flag, open_flag, firstday_of_calendar_month_flag, lastday_of_calendar_month_flag, holiday_text
+                                                                           , week_day_flag, firstday_of_calendar_month_flag, lastday_of_calendar_month_flag, open_flag,  holiday_flag, holiday_text
                                                                       ) 
                         SELECT 
 
@@ -103,7 +135,7 @@ DECLARE
                              , CAST(to_char(date_of_current_row, 'W') AS INT) AS week_of_month_number
                              , EXTRACT(year FROM AGE(the_current_date, date_of_current_row))*52 + EXTRACT(day FROM AGE(the_current_date, date_of_current_row)) /7. AS relative_weeks        --AGE returns an Interval
                              , EXTRACT(MONTH FROM date_of_current_row) AS calendar_month_number      --To be converted with leading zero later. 
-                             , to_char(date_of_current_row, 'Month') AS calendar_month_name
+                             , RTRIM(to_char(date_of_current_row, 'Month')) AS calendar_month_name
                              , EXTRACT(year FROM AGE(the_current_date, date_of_current_row))*12 + EXTRACT(month FROM AGE(the_current_date, date_of_current_row)) AS relative_months
 
                              , EXTRACT(QUARTER FROM date_of_current_row) AS calendar_quarter_number --Calendar quarter
@@ -116,27 +148,19 @@ DECLARE
                              , EXTRACT(year FROM AGE(the_current_date, date_of_current_row))*4 + EXTRACT(Quarter FROM AGE(the_current_date, date_of_current_row)) AS relative_quarters
                              , EXTRACT(YEAR FROM date_of_current_row) AS calendar_year_number
                              , EXTRACT(year FROM AGE(the_current_date, date_of_current_row)) AS relative_years
-                             , to_char(date_of_current_row, 'DD/MM/YYYY') AS standard_date
+                             , RTRIM(to_char(date_of_current_row, 'DD/MM/YYYY')) AS standard_date
 
+                             --0=Sunday, 1=Monday, 2=Tuesday, etc.
                              , CASE EXTRACT(DOW FROM date_of_current_row)::INT
-                                     WHEN 1 THEN FALSE
+                                     WHEN 0 THEN FALSE
+                                     WHEN 1 THEN TRUE
                                      WHEN 2 THEN TRUE
                                      WHEN 3 THEN TRUE
                                      WHEN 4 THEN TRUE
                                      WHEN 5 THEN TRUE
-                                     WHEN 6 THEN TRUE
-                                     WHEN 7 THEN FALSE
+                                     WHEN 6 THEN FALSE
                                  END AS week_day_flag
-                             , FALSE AS holiday_flag
-                             , CASE EXTRACT(DOW FROM date_of_current_row)::INT
-                                     WHEN 1 THEN FALSE
-                                     WHEN 2 THEN TRUE
-                                     WHEN 3 THEN TRUE
-                                     WHEN 4 THEN TRUE
-                                     WHEN 5 THEN TRUE
-                                     WHEN 6 THEN TRUE
-                                     WHEN 7 THEN TRUE
-                                 END AS open_flag
+
                              , CASE EXTRACT(DAY FROM date_of_current_row)::INT
                                     WHEN 1 THEN TRUE
                                     ELSE FALSE
@@ -145,25 +169,59 @@ DECLARE
                                     WHEN CAST(DATE_TRUNC('MONTH', the_current_date) +'1month'::INTERVAL-'1day'::INTERVAL AS DATE) = date_of_current_row THEN TRUE
                                     ELSE FALSE
                                 END AS lastday_of_calendar_month_flag
+
+                                --set according to the normal business hours of  the organization.
+                                --0=Sunday, 1=Monday, 2=Tuesday, etc.
+                                --In this case, the business hours are Sunday to Friday.
+                             , CASE EXTRACT(DOW FROM date_of_current_row)::INT
+                                     WHEN 0 THEN FALSE      
+                                     WHEN 1 THEN TRUE
+                                     WHEN 2 THEN TRUE
+                                     WHEN 3 THEN TRUE
+                                     WHEN 4 THEN TRUE
+                                     WHEN 5 THEN TRUE
+                                     WHEN 6 THEN TRUE
+                                 END AS open_flag
+
+                            --these columns are set in the "Holiday" function
+                             , FALSE AS holiday_flag
                              , ''   AS holiday_text
                         ;
 
                 --increment loop
                 date_of_current_row := date_of_current_row + INTERVAL '1 day';      --DATEADD(dd,1,@Date)
 
+--show top 10 and bottom 10
                 IF debug_flag THEN
                           RAISE NOTICE '  Bottom of loop:  date_of_current_row: %,   the_current_date: %,  the_current_month: %' , date_of_current_row, the_current_date , the_current_month;
                 END IF;
 
         END LOOP;
 
+              GET DIAGNOSTICS rows_inserted = ROW_COUNT;
 
---HANDLE  HOLIDAYS ————————————————————————————————————--
+                       IF debug_flag  THEN
+                                  RAISE NOTICE 'Table initialed with N records: %' , rows_inserted;
+                      END IF;
+
+
+        --**
+        --Set  Holidays.  Might need to alter the rules in this function.
+        SELECT * INTO rows_updated FROM edw.date_dim_update_holiday(debug_flag) ;
+
+                     IF debug_flag  THEN
+                                  RAISE NOTICE 'Holidays set for N rows/dates: %' , rows_updated;
+                      END IF;
+
 
         --**
         --Return status
         SELECT COUNT(*) INTO rows_inserted FROM  edw.date_dim; 
         RETURN rows_inserted;
+
+        --**
+        --Clean up
+        DROP TABLE IF EXISTS temp_day_of_week;
 
 END;
 $body$ 
@@ -171,9 +229,19 @@ LANGUAGE plpgsql;
 
 GO
 
-select * FROM edw.DateDim_insert ( '01/01/2010'::date, '01/01/2021'::date, FALSE) ;
+--**
+-- Execute the function to load the table
+
+
+--Empty the table
+--TRUNCATE TABLE edw.date_dim RESTRICT;
+
+SELECT * FROM edw.date_dim_insert ( '01/01/2010'::date, '01/01/2021'::date, FALSE) ;
 GO
-select * from edw.date_dim;
+
+select * from edw.date_dim order by date_pk;
+
+select * from edw.date_dim where holiday_text <> '';
 
 
 
