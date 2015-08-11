@@ -107,7 +107,9 @@ END;
                                                                       ) 
                         SELECT 
 
+                            --use a numeric date value to create a constant key, regardless of how how often the table is rebuilt.
                              CAST( to_char(date_of_current_row, 'YYYYMMDD') AS INT) AS date_pk
+
                              , date_of_current_row AS full_date
                              , EXTRACT(DAY FROM date_of_current_row)::SMALLINT AS day_of_month 
                              , CASE 
@@ -130,7 +132,9 @@ END;
                              , week_day_of_month AS day_of_week_in_month                                                                        --Occurance of this day in this month. If Third Monday then 3 and DOW would be Monday.   VERIFY
                              , EXTRACT(DOY FROM date_of_current_row)::INT AS day_of_year_number                      --Day of the year. 0 -- 365/366
 
+                             --relative days from date the date dim table was populated.  If table is rebuilt each time the EDW is refreshed, the the number of days is relative to the most recent entry into the EDW.
                              , date_of_current_row - the_current_date AS relative_days    
+
                              , EXTRACT(WEEK FROM date_of_current_row) AS week_of_year_number                --0-52/53
                              , CAST(to_char(date_of_current_row, 'W') AS INT) AS week_of_month_number
                              , EXTRACT(year FROM AGE(the_current_date, date_of_current_row))*52 + EXTRACT(day FROM AGE(the_current_date, date_of_current_row)) /7. AS relative_weeks        --AGE returns an Interval
@@ -207,6 +211,9 @@ END;
 
         --**
         --Set  Holidays.  Might need to alter the rules in this function.
+        --Ignoring the fact that holidays and therefore open/close dates might change, and  therefore would need to convert the holiday 
+        --and open/close table to open dim table (to treat as type SCD)
+        --
         SELECT * INTO rows_updated FROM edw.date_dim_update_holiday(debug_flag) ;
 
                      IF debug_flag  THEN

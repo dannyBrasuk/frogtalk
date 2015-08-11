@@ -1,5 +1,13 @@
 USE frogtalk;
 GO
+/*
+
+Associate dates with a holiday.  Indicate if the business/organization is open or closed on that date via fixed rule.
+
+Note that in this example, I'm ignoring the fact that holidays and/or open/close values can change over time.
+Therefore would need to convert the holiday and open/close entires to dim table(s), and to treat as type 4 SCD
+
+*/
 CREATE OR  REPLACE FUNCTION edw.date_dim_update_holiday 
 (
     in debug_flag boolean =FALSE                              -- toogle on/off run-time information 

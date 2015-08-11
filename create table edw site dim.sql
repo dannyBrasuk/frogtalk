@@ -16,6 +16,7 @@ CREATE TABLE edw.site_dim
     watershed_admnistrative_id        VARCHAR(9) NULL,                   --official, from the USGS GNIS database. Should reference boundary
     habitat_label                                VARCHAR(255) NULL,                          --defined by observer
     habitat_description                      VARCHAR(255) NULL,                          --defined by observer
+    protected_land_indicator             BOOLEAN NULL,                          --wildlife sancturary, national or state park, etc.
     land_use_description                   VARCHAR(255) NULL,
     longitude_wgs84                         NUMERIC(11,6) NULL,
     latitude_wgs84                            NUMERIC(11,6)  NULL,

@@ -16,7 +16,7 @@ CREATE TABLE edw.date_dim
         day_of_week_number INT NULL,
         day_of_week_in_month SMALLINT NULL,
         day_of_year_number INT NULL,
-        relative_days INT NULL,
+        relative_days INT NULL,                                                     --from date table was populated.  If rebilt each time the EDW is refreshed, the the number of days is relative to the most recent entry into the EDW.
         week_of_year_number SMALLINT NULL,
         week_of_month_number SMALLINT NULL,
         relative_weeks INT NULL,
