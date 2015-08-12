@@ -35,18 +35,13 @@ DECLARE
  BEGIN
 
         --**
-        --Trap for missing or invalid start and end daes.
-/*
+         --Limit table to 20 year range (just to keep it under control.
+        IF EXTRACT(years FROM AGE(end_date,start_date))::INT >= 20 THEN
+                        RAISE NOTICE 'Limit date range to under 20 years please.';
+                        RETURN 0;
+                        EXIT;
+        END IF;
 
-22007	invalid_datetime_format
-EXCEPTION
-    WHEN condition [ OR condition ... ] THEN
-        handler_statements
-    [ WHEN condition [ OR condition ... ] THEN
-          handler_statements
-      ... ]
-END;
-*/
         --**
         --Substitute a default if not supplied.
         IF start_date IS NULL THEN 
@@ -101,8 +96,9 @@ END;
 
                 --add row to table
                 INSERT INTO edw.date_dim    (     date_pk, full_date, day_of_month, day_suffix, day_of_week,day_of_week_number, day_of_week_in_month, day_of_year_number
-                                                                           , relative_days, week_of_year_number, week_of_month_number, relative_weeks, calendar_month_number, calendar_month_name, relative_months
-                                                                           , calendar_quarter_number, calendar_quarter_name, relative_quarters, calendar_year_number, relative_years, standard_date
+                                                                           , week_of_year_number, week_of_month_number, calendar_month_number, calendar_month_name
+                                                                           , calendar_quarter_number, calendar_quarter_name,  calendar_year_number,  standard_date
+                                                                           , relative_days, relative_weeks, relative_months, relative_quarters, relative_years
                                                                            , week_day_flag, firstday_of_calendar_month_flag, lastday_of_calendar_month_flag, open_flag,  holiday_flag, holiday_text
                                                                       ) 
                         SELECT 
@@ -132,15 +128,10 @@ END;
                              , week_day_of_month AS day_of_week_in_month                                                                        --Occurance of this day in this month. If Third Monday then 3 and DOW would be Monday.   VERIFY
                              , EXTRACT(DOY FROM date_of_current_row)::INT AS day_of_year_number                      --Day of the year. 0 -- 365/366
 
-                             --relative days from date the date dim table was populated.  If table is rebuilt each time the EDW is refreshed, the the number of days is relative to the most recent entry into the EDW.
-                             , date_of_current_row - the_current_date AS relative_days    
-
                              , EXTRACT(WEEK FROM date_of_current_row) AS week_of_year_number                --0-52/53
                              , CAST(to_char(date_of_current_row, 'W') AS INT) AS week_of_month_number
-                             , EXTRACT(year FROM AGE(the_current_date, date_of_current_row))*52 + EXTRACT(day FROM AGE(the_current_date, date_of_current_row)) /7. AS relative_weeks        --AGE returns an Interval
                              , EXTRACT(MONTH FROM date_of_current_row) AS calendar_month_number      --To be converted with leading zero later. 
                              , RTRIM(to_char(date_of_current_row, 'Month')) AS calendar_month_name
-                             , EXTRACT(year FROM AGE(the_current_date, date_of_current_row))*12 + EXTRACT(month FROM AGE(the_current_date, date_of_current_row)) AS relative_months
 
                              , EXTRACT(QUARTER FROM date_of_current_row) AS calendar_quarter_number --Calendar quarter
                              , CASE EXTRACT(QUARTER FROM date_of_current_row) 
@@ -149,10 +140,15 @@ END;
                                      WHEN 3 THEN 'Third'
                                      WHEN 4 THEN 'Fourth'
                                 END AS calendar_quarter_name
-                             , EXTRACT(year FROM AGE(the_current_date, date_of_current_row))*4 + EXTRACT(Quarter FROM AGE(the_current_date, date_of_current_row)) AS relative_quarters
                              , EXTRACT(YEAR FROM date_of_current_row) AS calendar_year_number
-                             , EXTRACT(year FROM AGE(the_current_date, date_of_current_row)) AS relative_years
                              , RTRIM(to_char(date_of_current_row, 'DD/MM/YYYY')) AS standard_date
+
+                             --relative days from date the date dim table was populated.  If table is rebuilt each time the EDW is refreshed, the the number of days is relative to the most recent entry into the EDW.
+                             ,  date_of_current_row - the_current_date AS relative_days    
+                             ,  ROUND( (date_of_current_row-the_current_date)  / 7,0)::int AS relative_weeks
+                             ,  EXTRACT(years FROM AGE(date_of_current_row, the_current_date ))*12::int   + EXTRACT(mons FROM AGE(date_of_current_row, the_current_date  )) AS relative_months 
+                             ,  TRUNC( (EXTRACT(years FROM AGE(date_of_current_row, the_current_date ))*12.0  + EXTRACT(mons FROM AGE(date_of_current_row, the_current_date  )) ) / 3.0)::INT  AS relative_quarters
+                             ,  EXTRACT(years FROM AGE(date_of_current_row, the_current_date )) AS  relative_years
 
                              --0=Sunday, 1=Monday, 2=Tuesday, etc.
                              , CASE EXTRACT(DOW FROM date_of_current_row)::INT
@@ -170,7 +166,7 @@ END;
                                     ELSE FALSE
                                 END AS firstday_of_calendar_month_flag
                              , CASE 
-                                    WHEN CAST(DATE_TRUNC('MONTH', the_current_date) +'1month'::INTERVAL-'1day'::INTERVAL AS DATE) = date_of_current_row THEN TRUE
+                                    WHEN CAST(DATE_TRUNC('MONTH', date_of_current_row) +'1month'::INTERVAL-'1day'::INTERVAL AS DATE) = date_of_current_row THEN TRUE
                                     ELSE FALSE
                                 END AS lastday_of_calendar_month_flag
 
@@ -241,14 +237,24 @@ GO
 
 
 --Empty the table
---TRUNCATE TABLE edw.date_dim RESTRICT;
+DELETE FROM edw.date_dim ;
 
-SELECT * FROM edw.date_dim_insert ( '01/01/2010'::date, '01/01/2021'::date, FALSE) ;
+SELECT * FROM edw.date_dim_insert ( '01/01/2010'::date, '01/01/2020'::date, FALSE) ;
 GO
 
-select * from edw.date_dim order by date_pk;
+--review random selection, plus the holidays.
 
-select * from edw.date_dim where holiday_text <> '';
+WITH selection
+AS
+(
+    SELECT * FROM edw.date_dim  OFFSET floor(random()* (SELECT COUNT(*) FROM edw.date_dim ) ) LIMIT 100 
+)
+SELECT * FROM selection 
+    UNION
+SELECT * FROM edw.date_dim  WHERE holiday_text <> ''
+    UNION 
+SELECT * FROM edw.date_dim WHERE open_flag = FALSE  AND day_of_week <> 'Sunday'
+ORDER BY date_pk;
 
 
 

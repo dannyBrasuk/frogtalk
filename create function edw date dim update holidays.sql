@@ -2,7 +2,11 @@ USE frogtalk;
 GO
 /*
 
-Associate dates with a holiday.  Indicate if the business/organization is open or closed on that date via fixed rule.
+Associate dates with a holiday. (not that this has anything to do with frog tracking, but its a conventional 
+attribute to include in a date dimension table.  (The exception could be July 4 and Jan 1 due to fireworks.)
+
+If the holiday is "celebrated" by the business/organization, then set the holiday flag to true.
+If the business/organization is closed on the holiday (and perhaps the day after or before) then set the open_flag to false.
 
 Note that in this example, I'm ignoring the fact that holidays and/or open/close values can change over time.
 Therefore would need to convert the holiday and open/close entires to dim table(s), and to treat as type 4 SCD
