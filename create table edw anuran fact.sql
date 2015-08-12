@@ -11,26 +11,30 @@ GO
 
 CREATE TABLE edw.anuran_fact  ( 
 
+            --surrogate key
 	anuran_fact_pk INT NOT NULL,
 
-            --grain
+            --grain  (We could conceivably use these columns as the primary key, to avoid duplicate observiations. 
+            --            Would make sense to prevent duplication. However, the observer key is likely to be unknown. 
+            --             Therefore, we best use the surrogate..)
 	local_datetime TIMESTAMP NOT NULL,
-	date_fk INT NOT NULL,
-            hour_fk  INT NOT NULL,                                             --computed, to allow link to official weather records.
 	site_fk INT NOT NULL,                                               --label, watershed, etc.
-	observer_fk  INT NULL,
+	observer_fk  INT NOT NULL,
 	anuran_species_fk INT NOT NULL,
 
-            --fact
+            --fact (non-additive, yes, but there's no other practical way to measure)
 	anuran_calling_code INT NOT NULL,                    --analagous to the quanttiy.  need to reconcile with inclination to "sum"
 
             --dimensions
+	date_fk INT NOT NULL,
+            hour_fk  INT NOT NULL,                                             --derived from timestamp; used for aggregation.
+
 	geographic_adminstrative_level_fk INT NULL,             --country, state/province, county
 
-            observed_site_condition_fk INT NULL,                        --per observer, against a mini dimensions
+            observed_site_condition_fk INT NULL,                        --condition of site per observer, against a mini dimensions
 
             weather_station_nearest_fk  INT NULL,                       --official weather measurements
-            weather_station_temperature_in_celsius INT NOT NULL,
+            weather_station_temperature_in_celsius INT NULL,
             weather_station_precipitation_in_cm NUMERIC(4,1) NULL,
             weather_station_wind_speed_in_kph NUMERIC(4,1) NULL,
             weather_station_relative_humidty_percent INT NULL,
