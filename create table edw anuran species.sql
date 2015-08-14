@@ -6,11 +6,11 @@
 USE frogtalk;
 GO
 
-DROP TABLE IF EXISTS edw.anuran_species RESTRICT;
+DROP TABLE IF EXISTS edw.anuran_species_dim RESTRICT;
 
 GO
 
-CREATE TABLE edw.anuran_species  
+CREATE TABLE edw.anuran_species_dim  
 (   
     anuran_species_pk INT NOT NULL,
     family VARCHAR(40) NULL,   
@@ -26,14 +26,14 @@ TABLESPACE myDataSpace
 
 GO
 
-INSERT INTO edw.anuran_species (anuran_species_pk, family, genus, species,  common_name)
+INSERT INTO edw.anuran_species_dim (anuran_species_pk, family, genus, species,  common_name)
 VALUES
 (1, 'Ranidae',  'Rana', 'Rana catesbeiana', 'Bullfrog'),
 (2, 'Ranidae',  'Rana', 'Rana clamitans', 'Green frog')
 ;
 
 GO
-SELECT * FROM edw.anuran_species;
+SELECT * FROM edw.anuran_species_dim;
 
 /*
 

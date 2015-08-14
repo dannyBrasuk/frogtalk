@@ -42,10 +42,3 @@ CREATE TABLE edw.date_dim
 WITH (FILLFACTOR=100)
 TABLESPACE myDataSpace
 ;
-GO
-ALTER TABLE edw.anuran_fact
-    ADD CONSTRAINT fk_anuran_date
-	FOREIGN KEY(date_fk)
-	REFERENCES edw.date_dim(date_pk)
-	ON DELETE SET NULL 
-	ON UPDATE CASCADE;

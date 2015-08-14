@@ -5,7 +5,8 @@ Anuran "fact" table for the EDW.  The grain is an observation of a specific spec
 
 USE frogtalk;
 GO
-DROP TABLE IF EXISTS edw.anuran_fact RESTRICT;
+DROP TABLE IF EXISTS edw.anuran_fact  RESTRICT;
+--DROP TABLE IF EXISTS edw.anuran_fact CASCADE;
 
 GO
 
@@ -29,7 +30,7 @@ CREATE TABLE edw.anuran_fact  (
 	date_fk INT NOT NULL,
             hour_fk  INT NOT NULL,                                             --derived from timestamp; used for aggregation.
 
-	geographic_adminstrative_level_fk INT NULL,             --country, state/province, county
+	geographic_administrative_level_fk INT NULL,             --country, state/province, county
 
             observed_site_condition_fk INT NULL,                        --condition of site per observer, against a mini dimensions
 
