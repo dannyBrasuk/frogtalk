@@ -11,15 +11,27 @@ GO
 
 CREATE TABLE edw.site_dim  
 (   
-    site_pk                                         INT NOT NULL,
-    watershed_official_name             VARCHAR(255) NULL,               --official, in USA, from the USGS GNIS database.
-    watershed_admnistrative_id        VARCHAR(9) NULL,                   --official, from the USGS GNIS database. Should reference boundary
-    habitat_label                                VARCHAR(255) NULL,                          --defined by observer
-    habitat_description                      VARCHAR(255) NULL,                          --defined by observer
-    protected_land_indicator             BOOLEAN NULL,                          --wildlife sancturary, national or state park, etc.
-    land_use_description                   VARCHAR(255) NULL,
-    longitude_wgs84                         NUMERIC(11,6) NULL,
-    latitude_wgs84                            NUMERIC(11,6)  NULL,
+    site_pk INT NOT NULL,
+    site_label VARCHAR(255) NULL,                         --defined by observer
+    site_description VARCHAR(255) NULL,                   --defined by observer
+
+    protected_land_indicator BOOLEAN NULL,                --wildlife sancturary, national or state park, etc.
+    water_source_description VARCHAR(40) NULL             --permanent, intermittent, ehphermal
+    land_use_description VARCHAR(255) NULL,
+
+    watershed_official_name VARCHAR(255) NULL,            --official, in USA, from the USGS GNIS database.
+    watershed_admnistrative_id VARCHAR(9) NULL,           --official, from the USGS GNIS database. Should reference boundary
+
+    country_code_iso3 VARCHAR(3) NOT NULL,
+    adminstrative_level1_name VARCHAR(256) NOT NULL,      --The State name, in the US
+    adminstrative_level2_name VARCHAR(256) NULL,          --The county name, in the US
+    adminstrative_level3_name VARCHAR(256) NULL,
+    adminstrative_level1_boundary_map_recordID INT NULL,
+    adminstrative_level2_boundary_map_recordID INT NULL,
+    adminstrative_level3_boundary_map_recordID INT NULL,
+
+    site_longitude_wgs84 NUMERIC(11,6) NULL,
+    site_latitude_wgs84 NUMERIC(11,6)  NULL,
 
     PRIMARY KEY (site_pk)  WITH (FILLFACTOR=90) USING INDEX TABLESPACE myindexspace  
 )
@@ -27,11 +39,4 @@ WITH (FILLFACTOR=90)
 TABLESPACE myDataSpace
 ;
 GO
-INSERT INTO edw.site_dim (site_pk, watershed_official_name, watershed_admnistrative_id, habitat_label, land_use_description, longitude_wgs84, latitude_wgs84) 
-VALUES
-(0, '', '', '', '', NULL, NULL),
-(1,'Middle Chattahoochee-Lake Harding Watershed', '03130002' ,'Sope Creek tributary at Pinestream Drive', 'Urban Forest', -84.46965, 33.959393),
-(2,'Middle Chattahoochee-Lake Harding Watershed', '03130002' ,'', 'Private Backyard',  -84.465294, 33.960068)
-;
-GO
-SELECT *  FROM edw.site_dim;
+
