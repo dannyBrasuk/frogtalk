@@ -6,7 +6,6 @@ Supporting indexes are included here for clarity.
 
 
 */
-\set ON_ERROR_STOP on
 
 DO $$
 
