@@ -35,7 +35,7 @@ BEGIN
         -- "Site"  
         RAISE INFO 'Index and constraint: site dim on fact';
 
-        DROP INDEX edw.anuran_site_index;
+        DROP INDEX  IF EXISTS edw.anuran_site_index;
 
         CREATE INDEX anuran_site_index ON edw.anuran_fact USING btree (site_fk)
             WITH (FILLFACTOR = 90)

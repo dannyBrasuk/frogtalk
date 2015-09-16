@@ -342,7 +342,5 @@ END;
 $body$ 
 LANGUAGE plpgsql;
 
-COMMENT ON FUNCTION edw.date_dim_update_holiday (debug_flag) IS 'The holiday function is executed independently from the Date Dim Insert function.';
---execute
--- SELECT * FROM edw.date_dim_update_holiday( TRUE::BOOLEAN) ;
+COMMENT ON FUNCTION edw.date_dim_update_holiday (boolean) IS 'The holiday function is executed independently from the Date Dim Insert function.';
         

@@ -59,7 +59,6 @@ TABLESPACE mydataspace;
 
 COMMENT ON TABLE edw.anuran_fact IS 'An anuran "fact" is a single observation. The grain is an observation of a specific species at a specific time and place (site) and by a specific person (observer).';
 
-
 COMMENT ON COLUMN edw.anuran_fact.anuran_fact_pk IS 'This is a surrogate key.';
 
 COMMENT ON COLUMN edw.anuran_fact.local_datetime IS 'A component of the grain.';
