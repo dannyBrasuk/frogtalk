@@ -2,13 +2,7 @@
    Anuran species
 
 */
-
-USE frogtalk;
-GO
-
 DROP TABLE IF EXISTS edw.anuran_species_dim RESTRICT;
-
-GO
 
 CREATE TABLE edw.anuran_species_dim  
 (   
@@ -23,31 +17,3 @@ CREATE TABLE edw.anuran_species_dim
 WITH (FILLFACTOR=90)
 TABLESPACE myDataSpace
 ;
-
-GO
-
-INSERT INTO edw.anuran_species_dim (anuran_species_pk, family, genus, species,  common_name)
-VALUES
-(1, 'Ranidae',  'Rana', 'Rana catesbeiana', 'Bullfrog'),
-(2, 'Ranidae',  'Rana', 'Rana clamitans', 'Green frog')
-;
-
-GO
-SELECT * FROM edw.anuran_species_dim;
-
-/*
-
-Sample:'
-Bullfrog
-
-Kingdom:	Animalia
-Phylum:	Chordata
-Subphylum:	Vertebrata
-Class:              Amphibia
-Order:             Anura
-Family:	Ranidae
-Genus:             Rana
-Species:	Rana. catesbeiana
-
-
-*/

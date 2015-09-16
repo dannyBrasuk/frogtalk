@@ -7,12 +7,8 @@
 
 */
 
-USE frogtalk;
-GO
 
 DROP TABLE IF EXISTS edw.extraordinary_weather_event_dim RESTRICT;
-
-GO
 
 CREATE TABLE edw.extraordinary_weather_event_dim  
 (   
@@ -24,11 +20,4 @@ CREATE TABLE edw.extraordinary_weather_event_dim
 WITH (FILLFACTOR=90)
 TABLESPACE myDataSpace
 ;
-
-GO
-
-INSERT INTO edw.extraordinary_weather_event_dim (extraordinary_weather_event_pk, extraordinary_weather_event_description)
-    VALUES (0, 'None'), (1, 'Hurricane'), (2, 'Excessive Lighting');
-GO
-SELECT * FROM edw.extraordinary_weather_event_dim ;
 

@@ -1,5 +1,4 @@
-USE frogtalk;
-GO
+
 /*
 
 Standard date dimension table.  
@@ -17,7 +16,7 @@ select * from edw.date_dim;
 
 */
 
-CREATE OR  REPLACE FUNCTION edw.date_dim_insert
+CREATE OR REPLACE FUNCTION edw.date_dim_insert
 (
     in start_date date =  '01/1/1900'::date, 
     in end_date date = '01/01/2030'::date,                      --Non inclusive. Stops on the day before this.
@@ -204,21 +203,12 @@ DECLARE
                                   RAISE NOTICE 'Table initialed with N records: %' , rows_inserted;
                       END IF;
 
-
-        --**
-        --Set  Holidays.  Might need to alter the rules in this function.
-        --Ignoring the fact that holidays and therefore open/close dates might change, and  therefore would need to convert the holiday 
-        --and open/close table to open dim table (to treat as type SCD)
-        --
-        SELECT * INTO rows_updated FROM edw.date_dim_update_holiday(debug_flag) ;
-
-                     IF debug_flag  THEN
-                                  RAISE NOTICE 'Holidays set for N rows/dates: %' , rows_updated;
-                      END IF;
-
+                     
+       COMMIT;
 
         --**
         --Return status
+
         SELECT COUNT(*) INTO rows_inserted FROM  edw.date_dim; 
         RETURN rows_inserted;
 
@@ -230,33 +220,7 @@ END;
 $body$ 
 LANGUAGE plpgsql;
 
-GO
 
---**
--- Execute the function to load the table
-
-
---Empty the table
-DELETE FROM edw.date_dim ;
-
-SELECT * FROM edw.date_dim_insert ( '01/01/2010'::date, '01/01/2020'::date, FALSE) ;
-GO
-
---review random selection, plus the holidays.
-
-WITH selection
-AS
-(
-    SELECT * FROM edw.date_dim  OFFSET floor(random()* (SELECT COUNT(*) FROM edw.date_dim ) ) LIMIT 100 
-)
-SELECT * FROM selection 
-    UNION
-SELECT * FROM edw.date_dim  WHERE holiday_text <> ''
-    UNION 
-SELECT * FROM edw.date_dim WHERE open_flag = FALSE  AND day_of_week <> 'Sunday'
-ORDER BY date_pk;
-
-
-
+COMMENT ON FUNCTION edw.date_dim_insert (start_date, end_date, debug_flag) IS 'The date function is used to populate the Date Dim table in the ETL.';
 
 

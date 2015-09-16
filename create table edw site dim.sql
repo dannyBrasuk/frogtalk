@@ -1,11 +1,10 @@
---   Dimension table of habitat sites for the EDW
+/*
+Dimension table of habitat sites for the EDW
+*/
 
-USE frogtalk;
-GO
 
 DROP TABLE IF EXISTS edw.site_dim RESTRICT;
 
-GO
 
 --Because Postgres does not support computed columns, compute the Point object in the ETL - if i decide I need it in EDW
 
@@ -38,5 +37,4 @@ CREATE TABLE edw.site_dim
 WITH (FILLFACTOR=90)
 TABLESPACE myDataSpace
 ;
-GO
 

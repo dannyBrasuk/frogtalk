@@ -1,7 +1,6 @@
---  Location of weather stations, used to provide the official weather data
+/*
+*/  Location of weather stations, used to provide the official weather data
 
-USE frogtalk;
-GO
 
 DROP TABLE IF EXISTS edw.weather_station_nearest_dim RESTRICT;
 
@@ -20,4 +19,3 @@ CREATE TABLE edw.weather_station_nearest_dim
 WITH (FILLFACTOR=90)
 TABLESPACE myDataSpace
 ;
-GO

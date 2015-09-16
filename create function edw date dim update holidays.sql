@@ -1,5 +1,4 @@
-USE frogtalk;
-GO
+
 /*
 
 Associate dates with a holiday. (not that this has anything to do with frog tracking, but its a conventional 
@@ -330,6 +329,9 @@ DECLARE
                                               RAISE NOTICE '# Holiday, Halloween: %' , records_updated;
                                   END IF;
 
+
+        COMMIT;
+                          
         --**
         --Return status
         SELECT COUNT(*) INTO records_updated FROM  edw.date_dim WHERE holiday_text <> '';
@@ -340,8 +342,7 @@ END;
 $body$ 
 LANGUAGE plpgsql;
 
-GO
-
+COMMENT ON FUNCTION edw.date_dim_update_holiday (debug_flag) IS 'The holiday function is executed independently from the Date Dim Insert function.';
 --execute
 -- SELECT * FROM edw.date_dim_update_holiday( TRUE::BOOLEAN) ;
         

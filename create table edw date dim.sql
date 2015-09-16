@@ -1,11 +1,10 @@
 --   Dimension table of dates for the EDW
---for frogs, probably do not need all the standard columns, but keep anyway
+--   For frogs, probably do not need all the standard columns, such as holidays, but keep anyway
 
-USE frogtalk;
-GO
-    DROP TABLE IF EXISTS edw.date_dim RESTRICT;
+
+DROP TABLE IF EXISTS edw.date_dim RESTRICT;
     --DROP TABLE IF EXISTS edw.date_dim CASCADE;
-GO
+
 CREATE TABLE edw.date_dim
 (
         date_pk INT NOT NULL,            --YYYYMMDD
@@ -16,7 +15,7 @@ CREATE TABLE edw.date_dim
         day_of_week_number INT NULL,
         day_of_week_in_month SMALLINT NULL,
         day_of_year_number INT NULL,
-        relative_days INT NULL,                                                     --from date table was populated.  If rebilt each time the EDW is refreshed, the the number of days is relative to the most recent entry into the EDW.
+        relative_days INT NULL,                                                     --from date table was populated.  If rebuilt each time the EDW is refreshed, the the number of days is relative to the most recent entry into the EDW.
         week_of_year_number SMALLINT NULL,
         week_of_month_number SMALLINT NULL,
         relative_weeks INT NULL,
@@ -42,3 +41,7 @@ CREATE TABLE edw.date_dim
 WITH (FILLFACTOR=100)
 TABLESPACE myDataSpace
 ;
+
+COMMENT ON TABLE edw.date_dim IS 'For frogs, standard "date dim" columns such as and open/close and holidays dont really apply, but are kept anyway for completeness.';
+
+COMMENT ON COLUMN edw.date_dim.relative_days IS '"Relative_days" is from the date the table was populated. If rebuilt each time the EDW is refreshed, then the number of days is relative to the most recent entry into the EDW.';

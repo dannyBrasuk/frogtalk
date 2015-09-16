@@ -12,5 +12,5 @@ CREATE DATABASE frogtalk
 GO
 GRANT CONNECT, TEMPORARY ON DATABASE frogtalk TO public;
 GRANT ALL ON DATABASE frogtalk TO postgres;
-GRANT ALL ON DATABASE frogtalk TO danny;
+GRANT ALL ON DATABASE frogtalk TO bigfrog;
 GO

@@ -10,17 +10,18 @@ for dev and testing I'm assuming one database.
 --EDW
 
 CREATE SCHEMA IF NOT EXISTS edw;
-GO
+
 CREATE SCHEMA IF NOT EXISTS stage;      --prior to merging with fact and dim tables
 
 --ETL
 
-GO
 CREATE SCHEMA IF NOT EXISTS extr;       --extract and validation
-GO
-CREATE SCHEMA IF NOT EXISTS trnfm;      --transform and enhance
-GO
-CREATE SCHEMA IF NOT EXISTS load;       --load to edw stage; 
-GO
 
+CREATE SCHEMA IF NOT EXISTS trnfm;      --transform and enhance
+
+CREATE SCHEMA IF NOT EXISTS load;       --load to edw stage; 
+
+
+/*
 SELECT * FROM information_schema.schemata;
+*/
