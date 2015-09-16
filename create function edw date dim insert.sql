@@ -221,6 +221,6 @@ $body$
 LANGUAGE plpgsql;
 
 
-COMMENT ON FUNCTION edw.date_dim_insert (start_date, end_date, debug_flag) IS 'The date function is used to populate the Date Dim table in the ETL.';
+COMMENT ON FUNCTION edw.date_dim_insert (date, date, boolean) IS 'The date function is used to populate the Date Dim table in the ETL.';
 
 

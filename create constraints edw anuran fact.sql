@@ -259,6 +259,5 @@ BEGIN
 
 
 
-END ;
---$$  language SQL;
-$$  language plpgsql;
+END;
+$$ language plpgsql;

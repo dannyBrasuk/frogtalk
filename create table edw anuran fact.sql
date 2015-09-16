@@ -3,8 +3,8 @@ Anuran "fact" table for the EDW.  The grain is an observation of a specific spec
 
 */
 
-DROP TABLE IF EXISTS edw.anuran_fact  RESTRICT;
---DROP TABLE IF EXISTS edw.anuran_fact CASCADE;
+DROP TABLE IF EXISTS edw.anuran_fact CASCADE;
+--DROP TABLE IF EXISTS edw.anuran_fact RESTRICT ;
 
 
 CREATE TABLE edw.anuran_fact  ( 

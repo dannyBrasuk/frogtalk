@@ -1,10 +1,10 @@
 /*
-*/  Location of weather stations, used to provide the official weather data
+Location of weather stations, used to provide the official weather data
+*/  
 
 
 DROP TABLE IF EXISTS edw.weather_station_nearest_dim RESTRICT;
 
-GO
 
 CREATE TABLE edw.weather_station_nearest_dim
 (   

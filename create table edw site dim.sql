@@ -15,7 +15,7 @@ CREATE TABLE edw.site_dim
     site_description VARCHAR(255) NULL,                   --defined by observer
 
     protected_land_indicator BOOLEAN NULL,                --wildlife sancturary, national or state park, etc.
-    water_source_description VARCHAR(40) NULL             --permanent, intermittent, ehphermal
+    water_source_description VARCHAR(40) NULL,             --permanent, intermittent, ehphermal
     land_use_description VARCHAR(255) NULL,
 
     watershed_official_name VARCHAR(255) NULL,            --official, in USA, from the USGS GNIS database.
