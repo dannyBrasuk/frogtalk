@@ -53,7 +53,7 @@ BEGIN
         -- "Observer"  
         RAISE INFO 'Index and constraint: observer dim on fact';
 
-        DROP INDEX IF EXISTS edw.anuran_observer_index;
+        DROP INDEX /* IF EXISTS */ edw.anuran_observer_index;
 
         CREATE INDEX anuran_observer_index  ON edw.anuran_fact  USING btree  (observer_fk)
         WITH (FILLFACTOR=90) 
