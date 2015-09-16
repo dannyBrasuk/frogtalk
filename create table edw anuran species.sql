@@ -2,7 +2,7 @@
    Anuran species
 
 */
-DROP TABLE IF EXISTS edw.anuran_species_dim RESTRICT;
+DROP TABLE IF EXISTS edw.anuran_species_dim CASCADE;
 
 CREATE TABLE edw.anuran_species_dim  
 (   

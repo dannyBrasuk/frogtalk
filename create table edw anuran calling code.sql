@@ -4,7 +4,7 @@
 */
 
 
-DROP TABLE IF EXISTS edw.anuran_calling_code RESTRICT;
+DROP TABLE IF EXISTS edw.anuran_calling_code CASCADE;
 
 CREATE TABLE edw.anuran_calling_code  
 (   

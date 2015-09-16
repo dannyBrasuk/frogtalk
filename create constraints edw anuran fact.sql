@@ -62,7 +62,7 @@ BEGIN
         ALTER TABLE edw.anuran_fact
             DROP CONSTRAINT IF EXISTS fk_anuran_observer,
             ADD CONSTRAINT fk_anuran_observer
-            FOREIGN KEY(observer_fk1)
+            FOREIGN KEY(observer_fk)
             REFERENCES edw.observer_dim(observer_pk)
             ON DELETE SET NULL 
             ON UPDATE CASCADE;
