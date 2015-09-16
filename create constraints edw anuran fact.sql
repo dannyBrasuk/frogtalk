@@ -141,26 +141,6 @@ BEGIN
             ON DELETE SET NULL 
             ON UPDATE CASCADE;
 
-
-        --*
-        -- Geo / Admin Level 
-
-        RAISE INFO 'Index and constraint: geographic administrative level dim on fact';
-
-        DROP INDEX IF EXISTS edw.anuran_geographic_administrative_level_index;
-
-        CREATE INDEX anuran_geographic_administrative_level_index  ON edw.anuran_fact  USING btree  (geographic_administrative_level_fk)
-        WITH (FILLFACTOR=90) 
-        TABLESPACE myindexspace;
-
-        ALTER TABLE edw.anuran_fact
-            DROP CONSTRAINT IF EXISTS fk_anuran_geographic_administrative_level,
-            ADD CONSTRAINT fk_anuran_geographic_administrative_level
-            FOREIGN KEY(geographic_administrative_level_fk)
-            REFERENCES edw.geographic_administrative_level_dim(geographic_administrative_level_pk)
-            ON DELETE SET NULL 
-            ON UPDATE CASCADE;
-
         --*
         -- Observed Site Condition
 
