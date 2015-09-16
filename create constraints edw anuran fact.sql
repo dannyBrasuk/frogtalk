@@ -6,6 +6,7 @@ Supporting indexes are included here for clarity.
 
 
 */
+\set ON_ERROR_STOP on
 
 DO $$
 
@@ -53,7 +54,7 @@ BEGIN
         -- "Observer"  
         RAISE INFO 'Index and constraint: observer dim on fact';
 
-        DROP INDEX /* IF EXISTS */ edw.anuran_observer_index;
+        DROP INDEX IF EXISTS edw.anuran_observer_index;
 
         CREATE INDEX anuran_observer_index  ON edw.anuran_fact  USING btree  (observer_fk)
         WITH (FILLFACTOR=90) 
@@ -62,7 +63,7 @@ BEGIN
         ALTER TABLE edw.anuran_fact
             DROP CONSTRAINT IF EXISTS fk_anuran_observer,
             ADD CONSTRAINT fk_anuran_observer
-            FOREIGN KEY(observer_fk)
+            FOREIGN KEY(observer_fk1)
             REFERENCES edw.observer_dim(observer_pk)
             ON DELETE SET NULL 
             ON UPDATE CASCADE;
