@@ -22,11 +22,11 @@ DECLARE
  BEGIN
         
        IF (SELECT COUNT(*) FROM edw.date_dim) = 0 THEN
-                    BEGIN
-                            RAISE NOTICE 'edw.date_dim is Empty.  Operation canceled.';
-                            RETURN 0;
-                    END;
-                END IF;
+            BEGIN
+                    RAISE NOTICE 'edw.date_dim is Empty.  Operation canceled.';
+                    RETURN 0;
+            END;
+       END IF;
 
 
       -- New Years Day
@@ -328,9 +328,6 @@ DECLARE
                                    IF debug_flag  THEN
                                               RAISE NOTICE '# Holiday, Halloween: %' , records_updated;
                                   END IF;
-
-
-        COMMIT;
                           
         --**
         --Return status

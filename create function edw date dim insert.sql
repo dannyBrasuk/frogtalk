@@ -31,7 +31,11 @@ DECLARE
         the_current_date date;       --@CurrentDate
         rows_inserted int;
         rows_updated int;
- BEGIN
+error_message text;
+error_hint text;
+error_detail text;
+
+BEGIN
 
         --**
          --Limit table to 20 year range (just to keep it under control.
@@ -73,143 +77,142 @@ DECLARE
                 RAISE NOTICE 'Initial values for date_of_current_row: %,   the_current_date: %,  the_current_month: %' , date_of_current_row, the_current_date , the_current_month;
         END IF;
 
-         --Loop to pipulate the table
-         WHILE date_of_current_row < end_date LOOP
- 
-                IF debug_flag THEN
-                          RAISE NOTICE 'Top of loop:  date_of_current_row: %,   the_current_date: %,  the_current_month: %' , date_of_current_row, the_current_date , the_current_month;
-                END IF;
+        --Loop to pipulate the table
 
-                IF EXTRACT(MONTH FROM date_of_current_row) <> the_current_month THEN
-                    the_current_month := EXTRACT(MONTH FROM date_of_current_row);
-                    UPDATE temp_day_of_week SET counter = 0;
-                END IF;
+                WHILE date_of_current_row < end_date LOOP
 
-                UPDATE temp_day_of_week
-                        SET counter = counter + 1
-                WHERE dow = CAST(EXTRACT (DOW FROM date_of_current_row) AS INT);
+                       IF debug_flag THEN
+                                 RAISE NOTICE 'Top of loop:  date_of_current_row: %,   the_current_date: %,  the_current_month: %' , date_of_current_row, the_current_date , the_current_month;
+                       END IF;
 
-                SELECT counter INTO week_day_of_month
-                FROM temp_day_of_week
-                WHERE dow = EXTRACT (DOW FROM date_of_current_row);
+                       IF EXTRACT(MONTH FROM date_of_current_row) <> the_current_month THEN
+                           the_current_month := EXTRACT(MONTH FROM date_of_current_row);
+                           UPDATE temp_day_of_week SET counter = 0;
+                       END IF;
 
-                --add row to table
-                INSERT INTO edw.date_dim    (     date_pk, full_date, day_of_month, day_suffix, day_of_week,day_of_week_number, day_of_week_in_month, day_of_year_number
-                                                                           , week_of_year_number, week_of_month_number, calendar_month_number, calendar_month_name
-                                                                           , calendar_quarter_number, calendar_quarter_name,  calendar_year_number,  standard_date
-                                                                           , relative_days, relative_weeks, relative_months, relative_quarters, relative_years
-                                                                           , week_day_flag, firstday_of_calendar_month_flag, lastday_of_calendar_month_flag, open_flag,  holiday_flag, holiday_text
-                                                                      ) 
-                        SELECT 
+                       UPDATE temp_day_of_week
+                               SET counter = counter + 1
+                       WHERE dow = CAST(EXTRACT (DOW FROM date_of_current_row) AS INT);
 
-                            --use a numeric date value to create a constant key, regardless of how how often the table is rebuilt.
-                             CAST( to_char(date_of_current_row, 'YYYYMMDD') AS INT) AS date_pk
+                       SELECT counter INTO week_day_of_month
+                       FROM temp_day_of_week
+                       WHERE dow = EXTRACT (DOW FROM date_of_current_row);
 
-                             , date_of_current_row AS full_date
-                             , EXTRACT(DAY FROM date_of_current_row)::SMALLINT AS day_of_month 
-                             , CASE 
-                                    WHEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4))  IN ('11','12','13') THEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'th'
-                                    WHEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) LIKE '1%' THEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'st'
-                                    WHEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) LIKE '2%' THEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'nd'
-                                    WHEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) LIKE '3%' THEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'rd'
-                                    ELSE CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'th' 
-                                END AS day_suffix
-                             , CASE EXTRACT(DOW FROM date_of_current_row)::INT
-                                    WHEN 0 THEN 'Sunday'
-                                    WHEN 1 THEN 'Monday'
-                                    WHEN 2 THEN 'Tuesday'
-                                    WHEN 3 THEN 'Wednesday'
-                                    WHEN 4 THEN 'Thursday'
-                                    WHEN 5 THEN 'Friday'
-                                    WHEN 6 THEN 'Saturday'
-                                END AS day_of_week
-                             , EXTRACT(DOW FROM date_of_current_row)::INT AS day_of_week_number
-                             , week_day_of_month AS day_of_week_in_month                                                                        --Occurance of this day in this month. If Third Monday then 3 and DOW would be Monday.   VERIFY
-                             , EXTRACT(DOY FROM date_of_current_row)::INT AS day_of_year_number                      --Day of the year. 0 -- 365/366
+                       --add row to table
 
-                             , EXTRACT(WEEK FROM date_of_current_row) AS week_of_year_number                --0-52/53
-                             , CAST(to_char(date_of_current_row, 'W') AS INT) AS week_of_month_number
-                             , EXTRACT(MONTH FROM date_of_current_row) AS calendar_month_number      --To be converted with leading zero later. 
-                             , RTRIM(to_char(date_of_current_row, 'Month')) AS calendar_month_name
+                       INSERT INTO edw.date_dim    (     date_pk, full_date, day_of_month, day_suffix, day_of_week,day_of_week_number, day_of_week_in_month, day_of_year_number
+                                                                                  , week_of_year_number, week_of_month_number, calendar_month_number, calendar_month_name
+                                                                                  , calendar_quarter_number, calendar_quarter_name,  calendar_year_number,  standard_date
+                                                                                  , relative_days, relative_weeks, relative_months, relative_quarters, relative_years
+                                                                                  , week_day_flag, firstday_of_calendar_month_flag, lastday_of_calendar_month_flag, open_flag,  holiday_flag, holiday_text
+                                                                             ) 
+                               SELECT 
 
-                             , EXTRACT(QUARTER FROM date_of_current_row) AS calendar_quarter_number --Calendar quarter
-                             , CASE EXTRACT(QUARTER FROM date_of_current_row) 
-                                     WHEN 1 THEN 'First'
-                                     WHEN 2 THEN 'Second'
-                                     WHEN 3 THEN 'Third'
-                                     WHEN 4 THEN 'Fourth'
-                                END AS calendar_quarter_name
-                             , EXTRACT(YEAR FROM date_of_current_row) AS calendar_year_number
-                             , RTRIM(to_char(date_of_current_row, 'DD/MM/YYYY')) AS standard_date
+                                   --use a numeric date value to create a constant key, regardless of how how often the table is rebuilt.
+                                    CAST( to_char(date_of_current_row, 'YYYYMMDD') AS INT) AS date_pk
 
-                             --relative days from date the date dim table was populated.  If table is rebuilt each time the EDW is refreshed, the the number of days is relative to the most recent entry into the EDW.
-                             ,  date_of_current_row - the_current_date AS relative_days    
-                             ,  ROUND( (date_of_current_row-the_current_date)  / 7,0)::int AS relative_weeks
-                             ,  EXTRACT(years FROM AGE(date_of_current_row, the_current_date ))*12::int   + EXTRACT(mons FROM AGE(date_of_current_row, the_current_date  )) AS relative_months 
-                             ,  TRUNC( (EXTRACT(years FROM AGE(date_of_current_row, the_current_date ))*12.0  + EXTRACT(mons FROM AGE(date_of_current_row, the_current_date  )) ) / 3.0)::INT  AS relative_quarters
-                             ,  EXTRACT(years FROM AGE(date_of_current_row, the_current_date )) AS  relative_years
+                                    , date_of_current_row AS full_date
+                                    , EXTRACT(DAY FROM date_of_current_row)::SMALLINT AS day_of_month 
+                                    , CASE 
+                                           WHEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4))  IN ('11','12','13') THEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'th'
+                                           WHEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) LIKE '1%' THEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'st'
+                                           WHEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) LIKE '2%' THEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'nd'
+                                           WHEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) LIKE '3%' THEN CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'rd'
+                                           ELSE CAST(EXTRACT(DAY FROM date_of_current_row) AS VARCHAR(4)) || 'th' 
+                                       END AS day_suffix
+                                    , CASE EXTRACT(DOW FROM date_of_current_row)::INT
+                                           WHEN 0 THEN 'Sunday'
+                                           WHEN 1 THEN 'Monday'
+                                           WHEN 2 THEN 'Tuesday'
+                                           WHEN 3 THEN 'Wednesday'
+                                           WHEN 4 THEN 'Thursday'
+                                           WHEN 5 THEN 'Friday'
+                                           WHEN 6 THEN 'Saturday'
+                                       END AS day_of_week
+                                    , EXTRACT(DOW FROM date_of_current_row)::INT AS day_of_week_number
+                                    , week_day_of_month AS day_of_week_in_month                                                                        --Occurance of this day in this month. If Third Monday then 3 and DOW would be Monday.   VERIFY
+                                    , EXTRACT(DOY FROM date_of_current_row)::INT AS day_of_year_number                      --Day of the year. 0 -- 365/366
 
-                             --0=Sunday, 1=Monday, 2=Tuesday, etc.
-                             , CASE EXTRACT(DOW FROM date_of_current_row)::INT
-                                     WHEN 0 THEN FALSE
-                                     WHEN 1 THEN TRUE
-                                     WHEN 2 THEN TRUE
-                                     WHEN 3 THEN TRUE
-                                     WHEN 4 THEN TRUE
-                                     WHEN 5 THEN TRUE
-                                     WHEN 6 THEN FALSE
-                                 END AS week_day_flag
+                                    , EXTRACT(WEEK FROM date_of_current_row) AS week_of_year_number                --0-52/53
+                                    , CAST(to_char(date_of_current_row, 'W') AS INT) AS week_of_month_number
+                                    , EXTRACT(MONTH FROM date_of_current_row) AS calendar_month_number      --To be converted with leading zero later. 
+                                    , RTRIM(to_char(date_of_current_row, 'Month')) AS calendar_month_name
 
-                             , CASE EXTRACT(DAY FROM date_of_current_row)::INT
-                                    WHEN 1 THEN TRUE
-                                    ELSE FALSE
-                                END AS firstday_of_calendar_month_flag
-                             , CASE 
-                                    WHEN CAST(DATE_TRUNC('MONTH', date_of_current_row) +'1month'::INTERVAL-'1day'::INTERVAL AS DATE) = date_of_current_row THEN TRUE
-                                    ELSE FALSE
-                                END AS lastday_of_calendar_month_flag
+                                    , EXTRACT(QUARTER FROM date_of_current_row) AS calendar_quarter_number --Calendar quarter
+                                    , CASE EXTRACT(QUARTER FROM date_of_current_row) 
+                                            WHEN 1 THEN 'First'
+                                            WHEN 2 THEN 'Second'
+                                            WHEN 3 THEN 'Third'
+                                            WHEN 4 THEN 'Fourth'
+                                       END AS calendar_quarter_name
+                                    , EXTRACT(YEAR FROM date_of_current_row) AS calendar_year_number
+                                    , RTRIM(to_char(date_of_current_row, 'DD/MM/YYYY')) AS standard_date
 
-                                --set according to the normal business hours of  the organization.
-                                --0=Sunday, 1=Monday, 2=Tuesday, etc.
-                                --In this case, the business hours are Sunday to Friday.
-                             , CASE EXTRACT(DOW FROM date_of_current_row)::INT
-                                     WHEN 0 THEN FALSE      
-                                     WHEN 1 THEN TRUE
-                                     WHEN 2 THEN TRUE
-                                     WHEN 3 THEN TRUE
-                                     WHEN 4 THEN TRUE
-                                     WHEN 5 THEN TRUE
-                                     WHEN 6 THEN TRUE
-                                 END AS open_flag
+                                    --relative days from date the date dim table was populated.  If table is rebuilt each time the EDW is refreshed, the the number of days is relative to the most recent entry into the EDW.
+                                    ,  date_of_current_row - the_current_date AS relative_days    
+                                    ,  ROUND( (date_of_current_row-the_current_date)  / 7,0)::int AS relative_weeks
+                                    ,  EXTRACT(years FROM AGE(date_of_current_row, the_current_date ))*12::int   + EXTRACT(mons FROM AGE(date_of_current_row, the_current_date  )) AS relative_months 
+                                    ,  TRUNC( (EXTRACT(years FROM AGE(date_of_current_row, the_current_date ))*12.0  + EXTRACT(mons FROM AGE(date_of_current_row, the_current_date  )) ) / 3.0)::INT  AS relative_quarters
+                                    ,  EXTRACT(years FROM AGE(date_of_current_row, the_current_date )) AS  relative_years
 
-                            --these columns are set in the "Holiday" function
-                             , FALSE AS holiday_flag
-                             , ''   AS holiday_text
-                        ;
+                                    --0=Sunday, 1=Monday, 2=Tuesday, etc.
+                                    , CASE EXTRACT(DOW FROM date_of_current_row)::INT
+                                            WHEN 0 THEN FALSE
+                                            WHEN 1 THEN TRUE
+                                            WHEN 2 THEN TRUE
+                                            WHEN 3 THEN TRUE
+                                            WHEN 4 THEN TRUE
+                                            WHEN 5 THEN TRUE
+                                            WHEN 6 THEN FALSE
+                                        END AS week_day_flag
 
-                --increment loop
-                date_of_current_row := date_of_current_row + INTERVAL '1 day';      --DATEADD(dd,1,@Date)
+                                    , CASE EXTRACT(DAY FROM date_of_current_row)::INT
+                                           WHEN 1 THEN TRUE
+                                           ELSE FALSE
+                                       END AS firstday_of_calendar_month_flag
+                                    , CASE 
+                                           WHEN CAST(DATE_TRUNC('MONTH', date_of_current_row) +'1month'::INTERVAL-'1day'::INTERVAL AS DATE) = date_of_current_row THEN TRUE
+                                           ELSE FALSE
+                                       END AS lastday_of_calendar_month_flag
 
---show top 10 and bottom 10
-                IF debug_flag THEN
-                          RAISE NOTICE '  Bottom of loop:  date_of_current_row: %,   the_current_date: %,  the_current_month: %' , date_of_current_row, the_current_date , the_current_month;
-                END IF;
+                                       --set according to the normal business hours of  the organization.
+                                       --0=Sunday, 1=Monday, 2=Tuesday, etc.
+                                       --In this case, the business hours are Sunday to Friday.
+                                    , CASE EXTRACT(DOW FROM date_of_current_row)::INT
+                                            WHEN 0 THEN FALSE      
+                                            WHEN 1 THEN TRUE
+                                            WHEN 2 THEN TRUE
+                                            WHEN 3 THEN TRUE
+                                            WHEN 4 THEN TRUE
+                                            WHEN 5 THEN TRUE
+                                            WHEN 6 THEN TRUE
+                                        END AS open_flag
 
-        END LOOP;
+                                   --these columns are set in the "Holiday" function
+                                    , FALSE AS holiday_flag
+                                    , ''   AS holiday_text
+                               ;
 
+                       --increment loop
+                       date_of_current_row := date_of_current_row + INTERVAL '1 day';      --DATEADD(dd,1,@Date)
+
+                       IF debug_flag THEN
+                                 RAISE NOTICE '  Bottom of loop:  date_of_current_row: %,   the_current_date: %,  the_current_month: %' , date_of_current_row, the_current_date , the_current_month;
+                       END IF;
+
+                END LOOP;
+            
               GET DIAGNOSTICS rows_inserted = ROW_COUNT;
 
                        IF debug_flag  THEN
                                   RAISE NOTICE 'Table initialed with N records: %' , rows_inserted;
                       END IF;
 
-                     
-       COMMIT;
-
         --**
         --Return status
 
         SELECT COUNT(*) INTO rows_inserted FROM  edw.date_dim; 
+
         RETURN rows_inserted;
 
         --**

@@ -1,5 +1,8 @@
 /*
-    Noise level metrics 
+   Noise level codes and their descriptions.
+
+   This data is part of the application itself, and therefore the data
+   is maintained in MongoDB.  However, in the ETL its merged with Sites data.
 
 */
 

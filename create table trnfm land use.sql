@@ -6,10 +6,10 @@
 
 */
 
-DROP TABLE IF EXISTS stage.land_use RESTRICT;
+DROP TABLE IF EXISTS trnfm.land_use RESTRICT;
 
 
-CREATE TABLE stage.land_use
+CREATE TABLE trnfm.land_use
 (
     land_use_pk INT NOT NULL,
     land_use_description VARCHAR(255) NOT NULL,

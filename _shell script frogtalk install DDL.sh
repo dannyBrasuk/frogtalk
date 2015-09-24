@@ -1,5 +1,8 @@
 #!/bin/bash
 #
+# Frogtalk EDW database
+# Use this script to install the database objects, pulling the SQL files from the local Git repository.
+#    (FYI.  This is )
 #
 # cd "/Users/MacDesktop/Documents/GitHub Repository/frogtalk"
 # cd "/Users/MacDesktop/Documents/shellscripts/frog"
@@ -25,6 +28,7 @@ return_code=99
 psql_exit_status=0
 
 # where to put the looging file
+	# Note that printf directs to STDOUT
 DOCPATH=$HOME"/Documents/"
 output_file=$DOCPATH"frogtalk_installation_log_$(date +%Y%m%d%H%M).txt"
 printf "Output file: $output_file\n\n"
@@ -105,7 +109,7 @@ function exit_report {
 
 function run_scripts() 
 {
-		local target=$1$2"*.sql"
+		local target=$1$2"*.sql"		# equivalent command: list=$(ls $1$2"*.sql) 
 		local output_file=$3
 		local file_number=$4
 		local hostname=$5
@@ -129,23 +133,29 @@ function run_scripts()
 					TEMPFILE="mktemp temp.$$"
 					trap "rm -rf $TEMPFILE" EXIT
 
-					# file exists
+					# if file exists, then do:
 		    		((file_counter+=1))		    		
 		    		# Use the command 'basename' to strip off path   (Note: printf goes to shell; echo to file.)
 					printf "Script file #$file_counter: \t`basename $f` ... \n"
 					echo -e "Script file #$file_counter: `basename $f` ($(date +%T))..." >> $output_file
 							
-					# PSQL options, (Good site: http://petereisentraut.blogspot.com/2010/03/running-sql-scripts-with-psql.html	)
-					# -X ignores the psql profile, so that in my case, the timing is not printed.	
-					# the log_line_prefix is having no impact, in either system log or mine
+					# PSQL options:
+						# (Good site: http://petereisentraut.blogspot.com/2010/03/running-sql-scripts-with-psql.html	)
+					# -X ignores the psql profile, so that in my case, items like "timing" are not sent to the file.	
+					# -q means quiet, as in suppressing output from DDL commands.  Doesn't have any impact when directing the output to file
+					# -w reads the password from the PGPASS file. OK for testing convenience.  (Uppercase would force a prompt)
+					# -a (not included) would echo all SQL to the file.  LOG and Debug messages do similar.
+					# -P pager off  (or --pset pager off). 
+							# The -p option controls the output format. For output to the screen, "off" prevents a scroll from holding up processing.
 					# client_min_messages: Valid values are (in order) DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-					# &> $TEMPFILE redirects PSQL output to file.   >> $TEMPFILE sends it to screen
-
-					# PGOPTIONS='--debug_pretty_print=TRUE --client-min-messages=INFO' psql -X -q -a -v ON_ERROR_STOP=1 -v log_line_prefix='%p %m> %%' --pset pager=off -h $hostname -d frogtalk -U bigfrog -f $f &> $TEMPFILE	
+					# output file:  &> $TEMPFILE redirects STDERR stream of PSQL into STDOUT, and then to file. (> $TEMPFILE sends STDERR stream it to terminal, STDOUT to file)
+						# > is stdout, 2> is stderr, &> is both
+						# The ">" sign is used for redirecting the output of a program to something other than stdout (standard output, which is the terminal by default).
+						# The >> appends to a file or creates the file if it doesn't exist. The > overwrites the file if it exists or creates it if it doesn't exist.
 
 					PGOPTIONS='--client_min_messages=NOTICE' \
 					psql -X -q \
-					--pset pager=off \
+					-P pager=off \
 					-h $hostname -d frogtalk -U bigfrog -w -f $f \
 					&> $TEMPFILE
 					
@@ -180,7 +190,7 @@ function run_scripts()
 					break
 			fi
 		done
-		IFS=$OLD_IFS
+ 
 
 		printf "\nScripts executed: $file_counter.\n\n"
 		echo -e "\n"$(date +%r)" ("$(date +%D)") Scripts executed: $file_counter.\n"	>> $output_file

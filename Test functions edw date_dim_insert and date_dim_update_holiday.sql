@@ -1,14 +1,13 @@
-/*
-     initialize the date dim table from the date table function
-
+/*     Test functions edw date dim insert and edw date dim update holiday functions
 */
+DO
 
-
-DO $$
+$test_exec$
 
 DECLARE rows_updated INT;
 
 BEGIN
+
 
     RAISE INFO '>>> Populate the Date Dim table';
 
@@ -22,11 +21,11 @@ BEGIN
 
     RAISE INFO '...Execute the function "edw.date_dim_insert" to populate it.';
 
-    SELECT * INTO rows_updated  FROM edw.date_dim_insert ( '01/01/2010'::date, '01/01/2020'::date, FALSE) ;
+    SELECT * INTO rows_updated FROM edw.date_dim_insert ( '01/01/2010'::date, '01/01/2020'::date, FALSE) ;
 
-                 IF debug_flag  THEN
-                              RAISE NOTICE 'Date rows added to Date Dim table: %' , rows_updated;
-                  END IF;
+            --PERFORM edw.date_dim_insert ( '01/01/2010'::date, '01/01/2020'::date, FALSE) ;
+
+       RAISE NOTICE '...Date rows added to Date Dim table: %' , rows_updated;
 
     --**
     --Set  Holidays.  Might need to alter the rules in this function.
@@ -36,16 +35,21 @@ BEGIN
 
     IF rows_updated > 0 THEN
 
-         SELECT * INTO rows_updated FROM edw.date_dim_update_holiday(debug_flag) ;
+             SELECT * INTO rows_updated FROM edw.date_dim_update_holiday(FALSE) ;
 
-                 IF debug_flag  THEN
-                              RAISE NOTICE 'Holidays set for N rows/dates: %' , rows_updated;
-                  END IF;
+            RAISE NOTICE 'Holidays set for N rows/dates: %' , rows_updated;
                   
     END IF;
               
     RAISE INFO '...Pull a random selection of records to review (including holidays)';
 
+
+
+END;
+$test_exec$ 
+language plpgsql;
+GO
+;
     WITH selection
     AS
     (
@@ -57,6 +61,3 @@ BEGIN
         UNION 
     SELECT * FROM edw.date_dim WHERE open_flag = FALSE  AND day_of_week <> 'Sunday'
     ORDER BY date_pk;
-
-END;
-$$  language plpgsql;
