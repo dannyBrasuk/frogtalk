@@ -31,9 +31,6 @@ DECLARE
         the_current_date date;       --@CurrentDate
         rows_inserted int;
         rows_updated int;
-error_message text;
-error_hint text;
-error_detail text;
 
 BEGIN
 
