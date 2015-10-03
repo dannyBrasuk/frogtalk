@@ -14,6 +14,8 @@ CREATE TABLE edw.site_dim
     site_label VARCHAR(255) NULL,                         --defined by observer
     site_description VARCHAR(255) NULL,                   --defined by observer
 
+    habitat_within_site_label  VARCHAR(255) NULL,                       
+
     protected_land_indicator BOOLEAN NULL,                --wildlife sancturary, national or state park, etc.
     water_source_description VARCHAR(40) NULL,             --permanent, intermittent, ehphermal
     land_use_description VARCHAR(255) NULL,
@@ -32,6 +34,8 @@ CREATE TABLE edw.site_dim
     site_longitude_wgs84 NUMERIC(11,6) NULL,
     site_latitude_wgs84 NUMERIC(11,6)  NULL,
 
+    date_added date NOT NULL,
+    date_updated date NOT NULL,
     PRIMARY KEY (site_pk)  WITH (FILLFACTOR=90) USING INDEX TABLESPACE myindexspace  
 )
 WITH (FILLFACTOR=90)
