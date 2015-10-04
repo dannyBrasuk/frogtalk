@@ -1,10 +1,13 @@
 /*
-Dimension table of habitat sites for the EDW
+
+Source of sites is the observer profile in the app, which is periodically
+synced to a NoSQL collection.
+
+In the ETL the site lists is retrieved, then enhanced to form this dimension table.
+
 */
 
-
-DROP TABLE IF EXISTS edw.site_dim RESTRICT;
-
+DROP TABLE IF EXISTS edw.site_dim CASCADE;
 
 --Because Postgres does not support computed columns, compute the Point object in the ETL - if i decide I need it in EDW
 
