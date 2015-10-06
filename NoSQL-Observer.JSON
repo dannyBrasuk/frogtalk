@@ -1,0 +1,47 @@
+{
+	_id: "me",
+	appData_id:0.5,
+	lastUpdateDate:ISODate("2015-05-01"),
+	contact:{	name: "",
+				emailAddress: "me@somewhere.com"
+			},
+	observerStatus:"Volunteer",
+	observerSites: 
+			[
+				{	name:"My yard",
+					description:"Adjacent to ephermeral stream, which feeds into Sope Creek"
+					longitude:-84.5,
+					latitude:33.9,
+					waterSource:0,
+					landUseCode:3,
+					lastUpdateDate:ISODate("2015-05-01")
+				},
+				{	name:"Pinestream S-turn", 
+					description:"Permanent tributary to Sope Creek, crossing under Pinestream Drive"
+					longitude:-84.46965,
+					latitude:33.959393,
+					waterSource:0,
+					landUseCode:2,
+					lastUpdateDate:ISODate("2015-05-01")	
+				},
+			]
+},
+{
+	_id: "him",
+	appData_id:0.5,
+	astUpdateDate:ISODate("2015-05-01")
+	contact:{	name: "his name",
+				emailAddress: "him@county.org"
+			},
+	affliation:"Professional",
+	affliation:"Cobb County Water Authority"	
+	observerSites:[
+			{	name:"Hyde Farm",
+				longitude:-84.391731,
+				latitude:33.965721,
+				waterSource:0,
+				landUseCode:4,
+				lastUpdateDate:ISODate("2014-05-24")
+			}
+		]
+}

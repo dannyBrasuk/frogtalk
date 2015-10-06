@@ -1,0 +1,74 @@
+{
+	_id:0.5,
+	_comment:"Data for version 0.5 of the app. Updated Aug 2015",
+	observerAffilation:[
+						{affiliation:"Unregistered", default:1},
+						{affiliation:"Volunteer", default:0},
+						{affiliation:"Professional", default:0}
+						],
+	species:[	
+				{code:1, family:"Ranidae", genus:"Rana", species:"Rana catesbeiana", commonName:"Bullfrog"}, 
+				{code:2, family:"Ranidae", genus:"Rana", species:"Rana clamitans", commonName:"Green frog"},
+				{code:3, family:"Ranidae", genus:"Rana", species:"Rana palustris", commonName:"Pickeral frog"},
+				{code:4, family:"Ranidae", genus:"Hyla", species:"Hyla chrysoscelis", commonName:"Cope's Gray Treefrog"},	
+				{code:5, family:"Ranidae", genus:"Pseudacris", species:"Pseudacris crucifer", commonName:"Spring Peeper"}			
+			],
+	callingCode:[
+					{code:0, description:"No sound"}, 
+					{code:1, description:"Individuals can be counted; there is space between calls."}, 
+					{code:2, description:"Two calls of individuals can be distinguished, but there are some overlapping calls."}, 
+					{code:3, description:"Full chorus, calls are constant, continuous and overlapping."}
+				],
+  	observationType:	[ 
+  							{code:1, description:"heard"}, 
+  							{code:3, description:"seen alive, not heard"}, 
+  							{code:3, description:"found dead"} 
+  						],       
+	currentCondition: 
+				[
+					{code:0 , description: "Not recorded"},
+					{code:1 , description: "Sunny and clear"},
+					{code:2 , description: "Partly cloudy or variable sky"},
+					{code:3 , description: "Overcast"},
+					{code:4 , description: "Fog or smoke" },
+					{code:5 , description: "Drizzle / light rain"}
+			 	],
+	landUse:	[
+					{code:0 , description: "Not recorded or unknown"},
+					{code:1 , description: "Urban Open Space"},
+					{code:2 , description: "Urban Forest"},
+					{code:3 , description: "Private Backyard"},
+					{code:4 , description: "Nature Park" },
+					{code:5 , description: "Rural"}
+			 	],
+	windScale:	[
+					{code:0 , description: "Not recorded or observed"},
+					{code:1 , description: "Calm"},
+					{code:2 , description: "Light Breeze"},
+					{code:3 , description: "Gentle Breeze"},
+					{code:4 , description: "Moderate Breeze" },
+					{code:5 , description: "Fresh Breeze"}
+			 	],
+	rainLast48Hours: [
+						{code:0 , description: "None"},
+						{code:1 , description: "Light (less than 1/2 inch)"},
+						{code:2 , description: "Moderate (1/2 - 1 inch)"},
+						{code:3 , description: "Heavy (< 1 inch)"}
+			 		],
+	waterLevel: [
+					{code:0 , description: "Not observed or unobservable"},
+					{code:1 , description: "Extremely dry - drought conditions"},
+					{code:2 , description: "Moist, but no standing water"},
+					{code:3 , description: "Shallow water (less than 1 foot)"},
+					{code:4 , description: "Deep water (more than 1 foot)" },
+					{code:5 , description: "Permanent Water"}
+			 	],
+	noiseLevel:	[
+					{code:0, description: "Not recorded or observed"},
+					{code:1, description: "No effect (owl calling)"},
+					{code:2, description: "Slight effect (distant traffic, dog barking)"},	
+					{code:3, description: "Moderate effect (nearby traffic, 2-5 cars passing)"},	
+					{code:4, description: "Serious effect (continuous traffic nearby, 6-10 cars passing)"},		
+					{code:5, description: "Profound effect (continuous traffic passing, construction noise)"}								
+				]
+}

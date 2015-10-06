@@ -1,0 +1,89 @@
+
+{
+	_id: <ObjectID>,
+	appData_id:0.5,
+	devicetype:"iPhone 6s",
+	observer_id: "me",
+	fieldDate: ISODate("2015-08-19"),
+	currentConditions: 4,
+	windScale: 0,
+	rainLast48Hours: 3,
+	currentTemperature: 23,
+	{
+		observerSite_name:"Pinestream S-turn",	
+		[
+			{
+					habitat:"",
+					time:"2015-08-19 20:10, EST",
+					waterLevel:5,
+					noiseLevel:1
+					[
+						{species_id:3, callingCode:0, observationTypeCode:3}
+					]
+			}
+		],
+		observerSite_name:"My yard",	
+		[
+			{
+					habitat:"floodplain",
+					time:"2015-08-19 20:00, EST"					
+					noiseLevel:1,
+					waterLevel:3,
+					comment:"heavy rain past 3 days",					
+					[
+						{species_id:4, callingCode:1, observationTypeCode:1}
+					]
+			}
+		]		
+	}
+},
+{
+	_id: <ObjectID>,
+	appData_id:0.5,
+	devicetype:"iPhone 6s",
+	observer_id: "me",
+	fieldDate: ISODate("2015-08-17"),
+	currentConditions: 4,
+	windScale: 0,
+	rainLast48Hours: 1,
+	currentTemperature: 29,	
+	{
+		observerSite_name:"My yard",	
+		[
+			{
+					habitat:"creek crossing under road",
+					time:"2014-08-12 20:00, EST",
+					noiseLevel:1,
+					waterLevel:3,	
+					comment:"creek is normally dry; now as water due to rain",										
+					[
+						{species_id:2, callingCode:1, observationTypeCode:1}
+					]
+			}
+		]	
+	}
+},
+{
+	_id: <ObjectID>,
+	appData_id:0.5,
+	devicetype:"iPhone 6s",
+	observer_id: "me",
+	fieldDate: ISODate("2014-08-12"),
+	currentConditions: 1,
+	windScale: 0,
+	rainLast48Hours: 1,
+	currentTemperature: 29,	
+	{
+		observerSite_name:"My yard",	
+		[
+			{
+					habitat:"floodplain",
+					time:"2015-08-17 20:30, EST",
+					[
+						{species_id:5, callingCode:1, observationTypeCode:1},
+						{species_id:4, callingCode:1, observationTypeCode:1}	
+					]
+			}
+		]	
+	}
+}
