@@ -5,6 +5,10 @@ synced to a NoSQL collection.
 
 In the ETL the site lists is retrieved, then enhanced to form this dimension table.
 
+Type 3 SCD.  (Because I'm thinking some attributes might be edited and I'd want to preserve the old values.)
+
+Consider moving the geo codes to the site characteristics table, because the could change over time.
+
 */
 
 DROP TABLE IF EXISTS edw.site_dim CASCADE;
@@ -15,13 +19,7 @@ CREATE TABLE edw.site_dim
 (   
     site_pk INT NOT NULL,
     site_label VARCHAR(255) NULL,                         --defined by observer
-    site_description VARCHAR(255) NULL,                   --defined by observer
-
-    habitat_within_site_label  VARCHAR(255) NULL,                       
-
-    protected_land_indicator BOOLEAN NULL,                --wildlife sancturary, national or state park, etc.
-    water_source_description VARCHAR(40) NULL,             --permanent, intermittent, ehphermal
-    land_use_description VARCHAR(255) NULL,
+    site_description VARCHAR(255) NULL,                   --defined by observer                    
 
     watershed_official_name VARCHAR(255) NULL,            --official, in USA, from the USGS GNIS database.
     watershed_admnistrative_id VARCHAR(9) NULL,           --official, from the USGS GNIS database. Should reference boundary
@@ -29,7 +27,7 @@ CREATE TABLE edw.site_dim
     country_code_iso3 VARCHAR(3) NOT NULL,
     adminstrative_level1_name VARCHAR(256) NOT NULL,      --The State name, in the US
     adminstrative_level2_name VARCHAR(256) NULL,          --The county name, in the US
-    adminstrative_level3_name VARCHAR(256) NULL,
+    adminstrative_level3_name VARCHAR(256) NULL,          --Because this level could change, 
     adminstrative_level1_boundary_map_recordID INT NULL,
     adminstrative_level2_boundary_map_recordID INT NULL,
     adminstrative_level3_boundary_map_recordID INT NULL,

@@ -1,5 +1,7 @@
 /*
-   Anuran species
+   Anuran species.  
+
+   Type 2 SCD.
 
 */
 DROP TABLE IF EXISTS edw.anuran_species_dim CASCADE;
